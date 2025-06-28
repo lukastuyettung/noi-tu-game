@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; color: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; color: #000000; min-height: 14.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px 'Helvetica Neue'; color: #000000; -webkit-text-stroke: #ffffff}
+    span.s1 {font: 12.0px Helvetica; -webkit-text-stroke: 0px #000000}
+    span.s2 {font-kerning: none; background-color: #ffffff}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="vi"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Chơi Nối Từ Đi với ChatGPT&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>text-align: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: #121212;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 2em;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input, button {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 0.5em;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.2em;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 1em;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#word-list {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 2em;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.5em;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.error {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: red;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h1&gt;Chơi Nối Từ Đi với ChatGPT&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p&gt;Từ hiện tại: &lt;strong id="current-word"&gt;bắt đầu&lt;/strong&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="text" id="user-input" placeholder="Nhập từ tiếp theo..." /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;br /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="submitBtn"&gt;Gửi&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p id="error-msg" class="error"&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="word-list"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h3&gt;Chuỗi từ đã chơi:&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p id="chain"&gt;bắt đầu&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Thay YOUR_OPENAI_API_KEY bằng key thật (không để lộ trong production)</p>
+<p class="p3"><span class="s1"><span class="Apple-converted-space">    </span>const API_KEY = '</span><span class="s2">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</span><span class="s1">';</span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let chain = ['bắt đầu'];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function getLastSyllable(word) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return word.trim().split(' ').slice(-1)[0];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function getFirstSyllable(word) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return word.trim().split(' ')[0];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function getMachineWord(lastWord) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const endpoint = 'https://api.openai.com/v1/chat/completions';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const promptSystem = 'Bạn là một AI rất giỏi trò nối từ hai tiếng tiếng Việt. Mỗi từ gồm 2 tiếng, tiếng đầu trùng với tiếng cuối từ trước, và chưa xuất hiện trong danh sách.';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const promptUser = `Từ trước: "${lastWord}". Các từ đã dùng: ${chain.join(', ')}. Hãy trả về một từ mới.`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const response = await fetch(endpoint, {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>method: 'POST',</p>
+<p class="p1"><span class="Apple-converted-space">        </span>headers: {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>'Content-Type': 'application/json',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>'Authorization': `Bearer ${API_KEY}`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body: JSON.stringify({</p>
+<p class="p1"><span class="Apple-converted-space">          </span>model: 'gpt-3.5-turbo',</p>
+<p class="p1"><span class="Apple-converted-space">          </span>messages: [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ role: 'system', content: promptSystem },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ role: 'user', content: promptUser }</p>
+<p class="p1"><span class="Apple-converted-space">          </span>],</p>
+<p class="p1"><span class="Apple-converted-space">          </span>temperature: 0.7,</p>
+<p class="p1"><span class="Apple-converted-space">          </span>max_tokens: 10</p>
+<p class="p1"><span class="Apple-converted-space">        </span>})</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const data = await response.json();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const text = data.choices?.[0]?.message?.content?.trim() || '';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Lọc chỉ lấy 2 từ đầu, loại bỏ dấu câu</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const words = text.replace(/[\.,!?]/g, '').split(/\s+/).slice(0, 2).join(' ');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return words;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function updateUI(current) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('current-word').textContent = current;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('chain').textContent = chain.join(' → ');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function submitWord() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const inputEl = document.getElementById('user-input');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const errorMsg = document.getElementById('error-msg');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const newWord = inputEl.value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>inputEl.value = '';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>errorMsg.textContent = '';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!newWord) return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const lastWord = chain[chain.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const expected = getLastSyllable(lastWord);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const first = getFirstSyllable(newWord);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (first !== expected) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>errorMsg.textContent = `Từ mới phải bắt đầu bằng tiếng cuối của từ trước: "${expected}".`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (chain.includes(newWord)) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>errorMsg.textContent = 'Từ này đã dùng rồi!';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>chain.push(newWord);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>updateUI(newWord);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Máy chơi</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(machineTurn, 500);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>async function machineTurn() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const lastWord = chain[chain.length - 1];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const next = await getMachineWord(lastWord);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!next) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('error-msg').textContent = 'Máy bí từ rồi, bạn thắng!';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>chain.push(next);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>updateUI(next);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('submitBtn').addEventListener('click', submitWord);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('user-input').addEventListener('keypress', e =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (e.key === 'Enter') submitWord();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
