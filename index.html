@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chơi Nối Từ Đi với ChatGPT</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      padding: 2em;
+    }
+    input, button {
+      padding: 0.5em;
+      font-size: 1.2em;
+      margin-top: 1em;
+    }
+    #word-list {
+      margin-top: 2em;
+      font-size: 1.5em;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chơi Nối Từ Đi với ChatGPT</h1>
+  <div>
+    <p>Từ hiện tại: <strong id="current-word">bắt đầu</strong></p>
+    <input type="text" id="user-input" placeholder="Nhập từ tiếp theo..." />
+    <br />
+    <button id="submitBtn">Gửi</button>
+    <p id="error-msg" class="error"></p>
+  </div>
+  <div id="word-list">
+    <h3>Chuỗi từ đã chơi:</h3>
+    <p id="chain">bắt đầu</p>
+  </div>
+
+  <script>
+    const API_KEY = 'YOUR_OPENAI_API_KEY'; // ← Thay bằng key thật
+    let chain = ['bắt đầu'];
+
+    function getLastSyllable(word) {
+      return word.trim().split(' ').slice(-1)[0];
+    }
+
+    function getFirstSyllable(word) {
+      return word.trim().split(' ')[0];
+    }
+
+    async function getMachineWord(lastWord) {
+      const endpoint = 'https://api.openai.com/v1/chat/completions';
+      const promptSystem = 'Bạn là một AI rất giỏi trò nối từ hai tiếng tiếng Việt. Mỗi từ gồm 2 tiếng, tiếng đầu trùng với tiếng cuối từ trước, và chưa xuất hiện trong danh sách.';
+      const promptUser = `Từ trước: "${lastWord}". Các từ đã dùng: ${chain.join(', ')}. Hãy trả về một từ mới.`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: promptSystem },
+            { role: 'user', content: promptUser }
+          ],
+          temperature: 0.7,
+          max_tokens: 10
+        })
+      });
+
+      const data = await response.json();
+      const text = data.choices?.[0]?.message?.content?.trim() || '';
+      const words = text.replace(/[\.,!?]/g, '').split(/\s+/).slice(0, 2).join(' ');
+      return words;
+    }
+
+    function updateUI(current) {
+      document.getElementById('current-word').textContent = current;
+      document.getElementById('chain').textContent = chain.join(' → ');
+    }
+
+    async function submitWord() {
+      const inputEl = document.getElementById('user-input');
+      const errorMsg = document.getElementById('error-msg');
+      const newWord = inputEl.value.trim();
+      inputEl.value = '';
+      errorMsg.textContent = '';
+
+      if (!newWord) return;
+      const lastWord = chain[chain.length - 1];
+      const expected = getLastSyllable(lastWord);
+      const first = getFirstSyllable(newWord);
+
+      if (first !== expected) {
+        errorMsg.textContent = `Từ mới phải bắt đầu bằng tiếng cuối của từ trước: "${expected}".`;
+        return;
+      }
+      if (chain.includes(newWord)) {
+        errorMsg.textContent = 'Từ này đã dùng rồi!';
+        return;
+      }
+
+      chain.push(newWord);
+      updateUI(newWord);
+      setTimeout(machineTurn, 500);
+    }
+
+    async function machineTurn() {
+      const lastWord = chain[chain.length - 1];
+      const next = await getMachineWord(lastWord);
+      if (!next) {
+        document.getElementById('error-msg').textContent = 'Máy bí từ rồi, bạn thắng!';
+        return;
+      }
+      chain.push(next);
+      updateUI(next);
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', submitWord);
+    document.getElementById('user-input').addEventListener('keypress', e => {
+      if (e.key === 'Enter') submitWord();
+    });
+  </script>
+</body>
+</html>
