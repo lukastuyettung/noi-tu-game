@@ -41,7 +41,7 @@
   </div>
 
   <script>
-    const API_KEY = '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'; // ← Thay bằng key thật
+    const API_KEY = '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'; // ← Nhớ thay bằng key thật
     let chain = ['bắt đầu'];
 
     function getLastSyllable(word) {
@@ -54,8 +54,8 @@
 
     async function getMachineWord(lastWord) {
       const endpoint = 'https://api.openai.com/v1/chat/completions';
-      const promptSystem = 'Bạn là một AI rất giỏi trò nối từ hai tiếng tiếng Việt. Mỗi từ gồm 2 tiếng, tiếng đầu trùng với tiếng cuối từ trước, và chưa xuất hiện trong danh sách.';
-      const promptUser = `Từ trước: "${lastWord}". Các từ đã dùng: ${chain.join(', ')}. Hãy trả về một từ mới.`;
+      const promptSystem = 'Bạn là một AI chơi trò nối từ tiếng Việt. Mỗi từ gồm 2 tiếng, tiếng đầu trùng với tiếng cuối của từ trước. Trả lời đúng duy nhất một từ, không giải thích, không xuống dòng.';
+      const promptUser = `Từ trước: "${lastWord}". Các từ đã dùng: ${chain.join(', ')}. Từ tiếp theo là gì?`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -70,13 +70,19 @@
             { role: 'user', content: promptUser }
           ],
           temperature: 0.7,
-          max_tokens: 10
+          max_tokens: 20
         })
       });
 
+      if (!response.ok) {
+        console.error("Lỗi API:", await response.text());
+        document.getElementById("error-msg").textContent = "Lỗi kết nối ChatGPT!";
+        return null;
+      }
+
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content?.trim() || '';
-      const words = text.replace(/[\.,!?]/g, '').split(/\s+/).slice(0, 2).join(' ');
+      const words = text.replace(/[.,!?]/g, '').split(/\s+/).slice(0, 2).join(' ');
       return words;
     }
 
